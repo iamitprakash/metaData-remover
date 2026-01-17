@@ -1,4 +1,4 @@
-import { Shield, FileText, ArrowRight, Lock, Zap, Sparkles, Rocket, Star, Heart, Flame } from 'lucide-react';
+import { Shield, FileText, ArrowRight, Lock, Zap, Sparkles, Rocket, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
@@ -7,7 +7,7 @@ interface LandingPageProps {
 }
 
 // Crazy floating particles with more variety
-const FloatingParticle = ({ delay, duration, type }: { delay: number; duration: number; type: 'star' | 'circle' | 'sparkle' }) => {
+const FloatingParticle = ({ delay, duration }: { delay: number; duration: number }) => {
   const [initialX] = useState(() => Math.random() * 100);
   const [initialY] = useState(() => Math.random() * 100);
   const [randomXOffset] = useState(() => Math.random() * 40 - 20);
@@ -49,38 +49,6 @@ const FloatingParticle = ({ delay, duration, type }: { delay: number; duration: 
   );
 };
 
-// Glitch text effect - simplified for clarity
-const GlitchText = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
-  return (
-    <span className={`relative inline-block ${className}`}>
-      {/* Base text - always visible and sharp */}
-      <span className="relative bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent" style={{ 
-        WebkitFontSmoothing: 'antialiased',
-        textRendering: 'optimizeLegibility',
-        willChange: 'auto'
-      }}>
-        {children}
-      </span>
-      {/* Glitch overlay - subtle effect */}
-      <motion.span
-        className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent pointer-events-none"
-        animate={{
-          x: [0, -2, 2, -2, 0],
-          opacity: [0, 0.6, 0.6, 0.6, 0],
-        }}
-        transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 5 }}
-        style={{ 
-          clipPath: 'inset(0 0 0 0)',
-          filter: 'blur(0px)',
-          WebkitFontSmoothing: 'antialiased',
-          textRendering: 'optimizeLegibility',
-        }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-};
 
 // Animated gradient text
 const GradientText = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
@@ -99,7 +67,6 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
     id: i,
     delay: i * 0.1,
     duration: 2 + Math.random() * 3,
-    type: ['star', 'circle', 'sparkle'][Math.floor(Math.random() * 3)] as 'star' | 'circle' | 'sparkle'
   })));
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -145,7 +112,7 @@ export const LandingPage = ({ onNavigate }: LandingPageProps) => {
 
       {/* Floating particles - MORE! */}
       {particles.map((p) => (
-        <FloatingParticle key={p.id} delay={p.delay} duration={p.duration} type={p.type} />
+        <FloatingParticle key={p.id} delay={p.delay} duration={p.duration} />
       ))}
 
       {/* Hero Section - CRAZY VERSION */}
