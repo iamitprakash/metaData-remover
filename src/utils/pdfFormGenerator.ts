@@ -2,13 +2,13 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export interface FormField {
   id: string;
-  type: 'text' | 'checkbox' | 'textarea' | 'radio' | 'dropdown' | 'signature' | 'label';
+  type: 'text' | 'checkbox' | 'textarea' | 'radio' | 'dropdown' | 'signature' | 'label' | 'ul' | 'ol';
   label: string;
   x: number;
   y: number;
   width: number;
   height: number;
-  options?: string[]; // For dropdown/radio
+  options?: string[]; // For dropdown/radio/lists
 }
 
 export async function generateFormPDF(fields: FormField[]): Promise<Blob> {
@@ -20,13 +20,6 @@ export async function generateFormPDF(fields: FormField[]): Promise<Blob> {
   // Height of A4 is 842. We need to flip Y coordinates because
   // DOM (0,0) is top-left, PDF (0,0) is bottom-left.
   const pageHeight = 842;
-
-  // Group radio buttons by label to map them to the same radio group if needed.
-  // For simplicity in this drag-and-drop builder, each radio field will be a group with one button (boolean-like)
-  // or we treat "radio" as a single button in a group. 
-  // BETTER APPROACH: Treat dragging a "Radio" as creating a single radio button. 
-  // Ideally, users would link them, but for this MVP, we'll create independent Checkboxes styled as radios 
-  // OR creates a RadioGroup with one option. Let's do RadioGroup with one option for now.
 
   for (const field of fields) {
     // Invert Y coordinate.
@@ -44,6 +37,25 @@ export async function generateFormPDF(fields: FormField[]): Promise<Blob> {
             color: rgb(0, 0, 0),
         });
         continue; // Skip creating a form widget
+    }
+
+    // Draw Lists (UL/OL)
+    if (field.type === 'ul' || field.type === 'ol') {
+        const items = field.options || ['Item 1', 'Item 2', 'Item 3'];
+        const fontSize = 10;
+        const lineHeight = 14;
+        
+        items.forEach((item, index) => {
+            const prefix = field.type === 'ul' ? '• ' : `${index + 1}. `;
+            page.drawText(`${prefix}${item}`, {
+                x: field.x,
+                y: (pdfY + field.height - 10) - (index * lineHeight), // Start top-ish and go down
+                size: fontSize,
+                font: helvetica,
+                color: rgb(0, 0, 0),
+            });
+        });
+        continue;
     }
 
     // For other fields, we do NOT draw a label. The entry box is standalone.

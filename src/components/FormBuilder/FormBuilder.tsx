@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable';
 import { motion } from 'framer-motion';
-import { Type, CheckSquare, Trash2, Download, Plus, AlignLeft, CircleDot, ChevronDown, PenTool } from 'lucide-react';
+import { Type, CheckSquare, Trash2, Download, Plus, AlignLeft, CircleDot, ChevronDown, PenTool, List, ListOrdered } from 'lucide-react';
 import { generateFormPDF, type FormField } from '../../utils/pdfFormGenerator';
 
 const DraggableFieldItem = ({ 
@@ -129,6 +129,43 @@ const DraggableFieldItem = ({
                 </div>
             )
           )}
+          {/* Lists (Unordered & Ordered) - Reusing Textarea Editor Logic */}
+          {(field.type === 'ul' || field.type === 'ol') && (
+            isEditing ? (
+                <textarea
+                    ref={inputRef as any}
+                    defaultValue={field.options?.join('\n') || ''}
+                    onBlur={(e) => {
+                        const lines = e.target.value.split('\n').filter(line => line.trim() !== '');
+                        onUpdateOptions(field.id, lines.length > 0 ? lines : ['Item 1', 'Item 2']);
+                        setIsEditing(false);
+                    }}
+                    onKeyDown={(e) => {
+                        e.stopPropagation();
+                    }}
+                    onDoubleClick={(e) => e.stopPropagation()}
+                    placeholder="Enter list items, one per line"
+                    className="absolute inset-0 w-full h-full bg-white text-xs text-black p-1 resize-none z-50 border border-blue-500 rounded no-drag"
+                    style={{ height: 'auto', minHeight: '100%' }}
+                />
+            ) : (
+                <div className="w-full h-full p-2 overflow-hidden">
+                    {field.type === 'ul' ? (
+                        <ul className="list-disc list-inside text-xs text-black">
+                            {field.options && field.options.map((opt, i) => (
+                                <li key={i} className="truncate">{opt}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <ol className="list-decimal list-inside text-xs text-black">
+                            {field.options && field.options.map((opt, i) => (
+                                <li key={i} className="truncate">{opt}</li>
+                            ))}
+                        </ol>
+                    )}
+                </div>
+            )
+          )}
           {field.type === 'signature' && (
              <div className="flex flex-col items-center justify-center opacity-50">
                  <PenTool className="w-6 h-6 text-zinc-400" />
@@ -218,6 +255,10 @@ export const FormBuilder = () => {
         width = 150;
         height = 30;
         label = 'Double click to edit text';
+    } else if (type === 'ul' || type === 'ol') {
+        width = 200;
+        height = 100;
+        label = type === 'ul' ? 'Bullet List' : 'Numbered List';
     }
 
     const newField: FormField = {
@@ -228,6 +269,7 @@ export const FormBuilder = () => {
       y: 50 + fields.length * 40,
       width,
       height,
+      options: (type === 'dropdown' || type === 'ul' || type === 'ol') ? ['Option 1', 'Option 2', 'Option 3'] : undefined
     };
     setFields([...fields, newField]);
   };
@@ -349,6 +391,28 @@ export const FormBuilder = () => {
                 <ChevronDown className="w-5 h-5" />
               </div>
               <span className="text-white font-medium">Dropdown</span>
+              <Plus className="w-4 h-4 ml-auto text-white group-hover:text-white" />
+            </button>
+
+            <button
+              onClick={() => addField('ul')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-left group"
+            >
+              <div className="p-2 bg-white/10 text-white rounded-md group-hover:scale-110 transition-transform">
+                <List className="w-5 h-5" />
+              </div>
+              <span className="text-white font-medium">Bullet List</span>
+              <Plus className="w-4 h-4 ml-auto text-white group-hover:text-white" />
+            </button>
+
+            <button
+              onClick={() => addField('ol')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-left group"
+            >
+              <div className="p-2 bg-white/10 text-white rounded-md group-hover:scale-110 transition-transform">
+                <ListOrdered className="w-5 h-5" />
+              </div>
+              <span className="text-white font-medium">Numbered List</span>
               <Plus className="w-4 h-4 ml-auto text-white group-hover:text-white" />
             </button>
 
