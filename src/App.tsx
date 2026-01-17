@@ -569,6 +569,17 @@ export default function App() {
               <span>Dhirender</span>
             </a>
           </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground/50">
+            <span>Sponsored by</span>
+            <a 
+              href="https://welcome.realdevsquad.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors font-medium"
+            >
+              Real Dev Squad
+            </a>
+          </div>
         </div>
       </footer>
     </div>
