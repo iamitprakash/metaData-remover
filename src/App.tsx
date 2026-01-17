@@ -14,7 +14,9 @@ import {
   IconPlus,
   IconX,
   IconLayoutGrid,
-  IconList
+  IconList,
+  IconBrandX,
+  IconHeart
 } from '@tabler/icons-react';
 import { FileUpload } from './components/ui/file-upload';
 import { FormBuilder } from './components/FormBuilder/FormBuilder';
@@ -527,9 +529,37 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      <footer className="mt-auto pt-20 pb-6 text-muted-foreground/40 text-xs flex items-center gap-2 font-medium tracking-wide">
-        <IconLock size={12} />
-        <span>SECURE LOCAL PROCESSING • ZERO SERVER UPLOADS</span>
+      <footer className="mt-auto pt-20 pb-6 text-muted-foreground/40 text-xs">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-2 font-medium tracking-wide">
+            <IconLock size={12} />
+            <span>SECURE LOCAL PROCESSING • ZERO SERVER UPLOADS</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground/50">
+            <span>Made with</span>
+            <IconHeart size={12} className="text-red-500 fill-red-500" />
+            <span>by</span>
+            <a 
+              href="https://x.com/twts_tejas" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors flex items-center gap-1.5 text-muted-foreground/60"
+            >
+              <IconBrandX size={14} />
+              <span>Tejas</span>
+            </a>
+            <span>&</span>
+            <a 
+              href="https://x.com/whoavidwivedi" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors flex items-center gap-1.5 text-muted-foreground/60"
+            >
+              <IconBrandX size={14} />
+              <span>Avi</span>
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
