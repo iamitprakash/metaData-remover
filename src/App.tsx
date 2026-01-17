@@ -1,214 +1,496 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import JSZip from 'jszip';
 import {
-    IconDownload,
-    IconRefresh,
-    IconLock,
-    IconSparkles,
-    IconCircleCheck,
-    IconShield,
-    IconMapPin,
-    IconCamera,
-    IconCalendar,
-    IconUser,
-    IconFileText
+  IconDownload,
+  IconRefresh,
+  IconLock,
+  IconCircleCheck,
+  IconShield,
+  IconWand,
+  IconEraser,
+  IconTrash,
+  IconArchive,
+  IconPhoto,
+  IconPlus,
+  IconX,
+  IconLayoutGrid,
+  IconList
 } from '@tabler/icons-react';
-import { ImageUploader } from './components/ImageUploader';
+import { FileUpload } from './components/ui/file-upload';
+import { FormBuilder } from './components/FormBuilder/FormBuilder';
 import { removeMetadata, formatBytes } from './utils/imageProcessor';
+import { Button } from './components/ui/stateful-button';
 
-function App() {
-    const [file, setFile] = useState<File | null>(null);
-    const [processedBlob, setProcessedBlob] = useState<Blob | null>(null);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const handleFileSelect = async (selectedFile: File) => {
-        setFile(selectedFile);
-        setIsProcessing(true);
-        setError(null);
-        setProcessedBlob(null);
-
-        try {
-            const blob = await removeMetadata(selectedFile);
-            setProcessedBlob(blob);
-        } catch (err) {
-            console.error(err);
-            setError('Failed to process image. Please try again.');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    const handleDownload = () => {
-        if (!processedBlob || !file) return;
-        const url = URL.createObjectURL(processedBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `clean_${file.name}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
-    const handleReset = () => {
-        setFile(null);
-        setProcessedBlob(null);
-        setError(null);
-    };
-
-    const InfoItem = ({ icon: Icon, label }: { icon: any, label: string }) => (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50">
-            <div className="p-2 rounded-full bg-primary/10 text-primary">
-                <Icon size={18} />
-            </div>
-            <span className="text-sm text-foreground/80 font-medium">{label}</span>
-            <div className="ml-auto text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded uppercase">
-                Removed
-            </div>
-        </div>
-    );
-
-    return (
-        <div className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 relative overflow-hidden selection:bg-primary/30 font-sans">
-
-            {/* Background Glows */}
-            <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
-            </div>
-
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center mb-12 relative z-10 w-full max-w-2xl"
-            >
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-border text-xs font-semibold text-primary mb-8 backdrop-blur-md shadow-sm">
-                    <IconShield size={14} className="stroke-[2.5]" />
-                    <span>Professional Privacy Tool</span>
-                </div>
-                <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-foreground leading-[1.1]">
-                    Metadata <span className="text-primary">Remover</span>
-                </h1>
-                <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto">
-                    Instantly strip sensitive Exif, XMP, and IPTC data from your photos.
-                    <br />
-                    <span className="text-muted-foreground/60 text-sm font-medium">Processing happens entirely in your browser.</span>
-                </p>
-            </motion.div>
-
-            <div className="w-full relative z-10">
-                <AnimatePresence mode="wait">
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute -top-16 left-1/2 -translate-x-1/2 w-full max-w-md p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-xl text-center shadow-lg"
-                        >
-                            {error}
-                        </motion.div>
-                    )}
-
-                    {!processedBlob ? (
-                        <motion.div
-                            key="uploader"
-                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            transition={{ duration: 0.3 }}
-                            className="w-full flex justify-center"
-                        >
-                            <ImageUploader onFileSelect={handleFileSelect} isProcessing={isProcessing} />
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="result"
-                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            className="w-full max-w-4xl mx-auto grid md:grid-cols-2 gap-6"
-                        >
-                            {/* Left Column: Image & Stats */}
-                            <div className="bg-card/50 backdrop-blur-xl border border-border p-8 rounded-[2rem] flex flex-col items-center text-center h-full justify-between shadow-xl">
-                                <div className="w-full">
-                                    <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 mx-auto ring-4 ring-emerald-500/5">
-                                        <IconCircleCheck className="w-8 h-8 text-emerald-500" />
-                                    </div>
-
-                                    <h3 className="text-2xl font-bold text-foreground mb-2">Sanitization Complete</h3>
-                                    <p className="text-muted-foreground mb-8 text-sm">
-                                        Your image has been scrubbed and re-encoded.
-                                    </p>
-
-                                    <div className="w-full bg-muted/50 rounded-2xl p-5 mb-8 border border-border/50">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 rounded-xl bg-muted overflow-hidden shrink-0 border border-border/50 shadow-inner">
-                                                {file && <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="prev" />}
-                                            </div>
-                                            <div className="text-left overflow-hidden">
-                                                <p className="text-sm font-semibold text-foreground truncate w-full" title={file?.name}>{file?.name}</p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-[10px] font-bold text-muted-foreground bg-border/50 px-2 py-0.5 rounded uppercase tracking-wider">{file?.type.split('/')[1]}</span>
-                                                    <span className="text-[10px] font-medium text-muted-foreground">{formatBytes(processedBlob.size)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="w-full space-y-3">
-                                    <button
-                                        onClick={handleDownload}
-                                        className="w-full py-4 bg-primary text-primary-foreground text-sm font-bold uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 hover:opacity-90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
-                                    >
-                                        <IconDownload size={20} className="stroke-[2.5]" /> Download Clean Image
-                                    </button>
-                                    <button
-                                        onClick={handleReset}
-                                        className="w-full py-3 text-muted-foreground text-xs font-semibold rounded-xl flex items-center justify-center gap-2 hover:bg-muted/50 transition-all active:scale-[0.98]"
-                                    >
-                                        <IconRefresh size={14} /> Process Another Image
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Right Column: Privacy Report */}
-                            <div className="bg-card/30 backdrop-blur-md border border-border p-8 rounded-[2rem] flex flex-col shadow-sm">
-                                <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border/50">
-                                    <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
-                                        <IconFileText size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-foreground">Privacy Report</h3>
-                                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Data removed from this file</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2.5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                                    <InfoItem icon={IconMapPin} label="GPS Coordinates" />
-                                    <InfoItem icon={IconCamera} label="Camera Model & Lens" />
-                                    <InfoItem icon={IconCalendar} label="Date Created" />
-                                    <InfoItem icon={IconUser} label="Author & Copyright" />
-                                    <InfoItem icon={IconSparkles} label="Software Info" />
-                                    <InfoItem icon={IconFileText} label="Embedded Keywords" />
-                                    <InfoItem icon={IconFileText} label="Thumbnail Data" />
-                                </div>
-
-                                <div className="mt-8 pt-6 border-t border-border/50 text-center">
-                                    <p className="text-xs text-muted-foreground/70 leading-relaxed italic">
-                                        "This file is now safe to share without revealing personal metadata."
-                                    </p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-            <footer className="mt-auto pt-20 pb-6 text-muted-foreground/40 text-xs flex items-center gap-2 font-medium tracking-wide">
-                <IconLock size={12} />
-                <span>SECURE LOCAL PROCESSING • ZERO SERVER UPLOADS</span>
-            </footer>
-        </div>
-    );
+interface ProcessedFile {
+  original: File;
+  cleanedBlob: Blob;
+  status: 'pending' | 'cleaning' | 'done' | 'error';
+  previewUrl: string;
 }
 
-export default App;
+interface FileWithPreview {
+  file: File;
+  previewUrl: string;
+}
+
+function MetadataRemover() {
+  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [processedFiles, setProcessedFiles] = useState<ProcessedFile[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const addMoreInputRef = useRef<HTMLInputElement>(null);
+
+  // Clean up preview URLs when component unmounts or files change
+  useEffect(() => {
+    return () => {
+      files.forEach(f => URL.revokeObjectURL(f.previewUrl));
+      processedFiles.forEach(pf => URL.revokeObjectURL(pf.previewUrl));
+    };
+  }, [files, processedFiles]);
+
+  const createPreview = (file: File) => ({
+    file,
+    previewUrl: URL.createObjectURL(file)
+  });
+
+  const handleFileSelect = (selectedFiles: File[]) => {
+    const newFiles = selectedFiles.map(createPreview);
+    // Since FileUpload is only shown when files is empty, we can safely replace the state.
+    // This also prevents duplication if the handler is called twice (e.g. StrictMode side-effects).
+    setFiles(newFiles);
+    setError(null);
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const fileToRemove = files[index];
+    URL.revokeObjectURL(fileToRemove.previewUrl);
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
+  const handleAddMoreClick = () => {
+    addMoreInputRef.current?.click();
+  };
+
+  const handleAddMoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files)
+        .filter(f => f.type.startsWith('image/'))
+        .map(createPreview);
+      setFiles(prev => [...prev, ...newFiles]);
+    }
+    // Reset input
+    if (addMoreInputRef.current) addMoreInputRef.current.value = '';
+  };
+
+  const handleRemoveMetadata = async () => {
+    if (files.length === 0) return;
+
+    setIsProcessing(true);
+    setError(null);
+    const newProcessedFiles: ProcessedFile[] = [];
+
+    // Enforce minimum 2 second delay for UX
+    const timerPromise = new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Process logic
+    const processingPromise = (async () => {
+      for (const { file } of files) {
+        try {
+          const blob = await removeMetadata(file);
+          newProcessedFiles.push({
+            original: file,
+            cleanedBlob: blob,
+            status: 'done',
+            previewUrl: URL.createObjectURL(blob)
+          });
+        } catch (err) {
+          console.error(`Failed to process ${file.name}`, err);
+        }
+      }
+    })();
+
+    try {
+      await Promise.all([processingPromise, timerPromise]);
+      setProcessedFiles(newProcessedFiles);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to process some files. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDownloadSingle = (pf: ProcessedFile) => {
+    const url = URL.createObjectURL(pf.cleanedBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clean_${pf.original.name}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadAll = async () => {
+    if (processedFiles.length === 0) return;
+
+    const zip = new JSZip();
+    processedFiles.forEach(pf => {
+      zip.file(`clean_${pf.original.name}`, pf.cleanedBlob);
+    });
+
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "clean_images.zip";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleReset = () => {
+    files.forEach(f => URL.revokeObjectURL(f.previewUrl));
+    processedFiles.forEach(pf => URL.revokeObjectURL(pf.previewUrl));
+    setFiles([]);
+    setProcessedFiles([]);
+    setError(null);
+  };
+
+  return (
+    <div className="w-full relative z-10">
+      <AnimatePresence mode="popLayout">
+        {error && (
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="absolute -top-16 left-1/2 -translate-x-1/2 w-full max-w-md p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl text-center shadow-lg"
+          >
+            {error}
+          </motion.div>
+        )}
+
+        {/* Upload State */}
+        {files.length === 0 && processedFiles.length === 0 && (
+          <motion.div
+            key="uploader"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="w-full flex justify-center"
+          >
+            <FileUpload onChange={handleFileSelect} isProcessing={isProcessing} />
+          </motion.div>
+        )}
+
+        {/* Review & Process State */}
+        {files.length > 0 && processedFiles.length === 0 && (
+          <motion.div
+            key="review"
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="w-full max-w-3xl mx-auto"
+          >
+            <div className="glass-panel p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">Review Files</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Ready to strip metadata.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {/* View Toggles */}
+                  <div className="flex p-1 bg-secondary/50 rounded-lg border border-border/50">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                      title="Grid View"
+                    >
+                      <IconLayoutGrid size={16} />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                      title="List View"
+                    >
+                      <IconList size={16} />
+                    </button>
+                  </div>
+
+                  <div className="w-px h-6 bg-border/50 mx-2"></div>
+
+                  <button onClick={handleReset} className="text-sm text-red-400 hover:text-red-300 flex items-center gap-1 font-medium transition-colors">
+                    <IconTrash size={16} /> Clear List
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-8 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+                {viewMode === 'grid' ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {files.map((item, idx) => (
+                      <div key={idx} className="group relative aspect-square rounded-2xl bg-secondary/30 border border-border/50 overflow-hidden shadow-sm hover:shadow-md transition-all">
+                        <img src={item.previewUrl} alt={item.file.name} className="w-full h-full object-cover" />
+
+                        {/* Overlay Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        {/* Info on Hover */}
+                        <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                          <p className="text-xs text-white font-medium truncate">{item.file.name}</p>
+                          <p className="text-[10px] text-white/70">{formatBytes(item.file.size)}</p>
+                        </div>
+
+                        {/* Delete Button on Hover */}
+                        <button
+                          onClick={() => handleRemoveFile(idx)}
+                          className="absolute top-2 right-2 p-1.5 bg-red-500/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:bg-red-600 shadow-lg"
+                          title="Remove File"
+                        >
+                          <IconX size={14} />
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Add More Button (Grid) */}
+                    <button
+                      onClick={handleAddMoreClick}
+                      className="aspect-square rounded-2xl border-2 border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-all group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-secondary group-hover:bg-primary/20 flex items-center justify-center transition-colors">
+                        <IconPlus size={20} />
+                      </div>
+                      <span className="text-xs font-semibold">Add More</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {files.map((item, idx) => (
+                      <div key={idx} className="group flex items-center gap-4 p-3 rounded-xl bg-secondary/20 border border-border/50 hover:border-border transition-all">
+                        <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden shrink-0 border border-border/50">
+                          <img src={item.previewUrl} className="w-full h-full object-cover" alt="thumb" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">{item.file.name}</p>
+                          <p className="text-xs text-muted-foreground">{formatBytes(item.file.size)}</p>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveFile(idx)}
+                          className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                          title="Remove"
+                        >
+                          <IconX size={18} />
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={handleAddMoreClick}
+                      className="w-full py-3 rounded-xl border-2 border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-all"
+                    >
+                      <IconPlus size={16} />
+                      <span className="text-sm font-semibold">Add More Files</span>
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  ref={addMoreInputRef}
+                  onChange={handleAddMoreChange}
+                  className="hidden"
+                  multiple
+                  accept="image/*"
+                />
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <Button onClick={handleRemoveMetadata} className="w-full py-6 text-lg shadow-lg shadow-primary/20">
+                  <IconEraser className="mr-2 w-5 h-5" /> Remove Metadata
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  Processing happens locally. No data leaves your device.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Results State */}
+        {processedFiles.length > 0 && (
+          <motion.div
+            key="results"
+            layout
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-5xl mx-auto"
+          >
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center p-3 bg-emerald-500/10 rounded-full ring-1 ring-emerald-500/20 mb-4">
+                <IconCircleCheck className="w-8 h-8 text-emerald-500" />
+              </div>
+              <h3 className="text-3xl font-bold text-foreground">Processing Complete!</h3>
+              <p className="text-muted-foreground mt-2 text-lg">
+                Cleaned {processedFiles.length} {processedFiles.length === 1 ? 'file' : 'files'} successfully.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mb-10">
+              {processedFiles.map((pf, idx) => (
+                <div key={idx} className="group relative aspect-square rounded-2xl bg-card border border-border overflow-hidden shadow-lg hover:shadow-xl transition-all">
+                  <img src={pf.previewUrl} className="w-full h-full object-cover" alt="cleaned" />
+
+                  {/* Success Badge */}
+                  <div className="absolute top-3 left-3 px-2 py-1 bg-emerald-500/90 backdrop-blur-sm text-white text-[10px] font-bold uppercase rounded-md shadow-sm">
+                    Cleaned
+                  </div>
+
+                  {/* Overlay & Download */}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 backdrop-blur-[2px]">
+                    <button
+                      onClick={() => handleDownloadSingle(pf)}
+                      className="px-4 py-2 bg-white text-black rounded-xl font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition-all hover:scale-105 flex items-center gap-2"
+                    >
+                      <IconDownload size={16} /> Download
+                    </button>
+                    <div className="text-center px-2 transform translate-y-4 group-hover:translate-y-0 transition-all delay-75">
+                      <p className="text-white text-xs font-medium truncate w-32">{pf.original.name}</p>
+                      <p className="text-white/60 text-[10px]">{formatBytes(pf.cleanedBlob.size)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              {processedFiles.length > 1 && (
+                <button
+                  onClick={handleDownloadAll}
+                  className="w-full sm:w-auto px-8 py-4 bg-primary text-primary-foreground text-sm font-bold uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-primary/25 active:scale-[0.98]"
+                >
+                  <IconArchive size={20} /> Download All (ZIP)
+                </button>
+              )}
+              <button
+                onClick={handleReset}
+                className="w-full sm:w-auto px-8 py-4 bg-muted/50 text-foreground text-sm font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-muted/80 transition-all border border-transparent hover:border-border"
+              >
+                <IconRefresh size={18} /> Process More
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<'home' | 'builder'>('home');
+
+  return (
+    <div className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 relative overflow-hidden selection:bg-primary/30 font-sans">
+      {/* Background Glows */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center mb-10 relative z-10 w-full max-w-2xl"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-muted border border-border text-xs font-semibold text-primary mb-8 backdrop-blur-md shadow-sm">
+          <IconShield size={14} className="stroke-[2.5]" />
+          <span>Professional Privacy Tool</span>
+        </div>
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-foreground leading-[1.1]">
+          Metadata <span className="text-primary">Remover</span>
+        </h1>
+        <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto mb-8">
+          Instantly strip sensitive Exif, XMP, and IPTC data from your photos.
+        </p>
+
+        {/* Tab Navigation */}
+        <div className="inline-flex p-1.5 bg-muted/50 rounded-2xl border border-border/50 backdrop-blur-sm">
+          <button
+            onClick={() => setActiveTab('home')}
+            className={`
+                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                            ${activeTab === 'home' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                        `}
+          >
+            {activeTab === 'home' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <IconEraser size={16} /> Metadata Cleaner
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('builder')}
+            className={`
+                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                            ${activeTab === 'builder' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                        `}
+          >
+            {activeTab === 'builder' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <IconWand size={16} /> Form Builder
+            </span>
+          </button>
+        </div>
+      </motion.div>
+
+      <div className="w-full relative z-10">
+        <AnimatePresence mode="wait">
+          {activeTab === 'home' ? (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MetadataRemover />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="builder"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FormBuilder />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <footer className="mt-auto pt-20 pb-6 text-muted-foreground/40 text-xs flex items-center gap-2 font-medium tracking-wide">
+        <IconLock size={12} />
+        <span>SECURE LOCAL PROCESSING • ZERO SERVER UPLOADS</span>
+      </footer>
+    </div>
+  );
+}
