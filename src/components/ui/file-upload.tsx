@@ -6,25 +6,38 @@ import { cn } from "@/lib/utils";
 export const FileUpload = ({
     onChange,
     isProcessing,
+    accept,
+    filterFiles,
 }: {
     onChange?: (files: File[]) => void;
     isProcessing?: boolean;
+    accept?: string; // e.g., "image/*", "application/pdf", ".pdf,.docx"
+    filterFiles?: (files: File[]) => File[]; // Custom filter function
 }) => {
     const [files, setFiles] = useState<File[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = (newFiles: File[]) => {
-        // Filter for images only
-        const imageFiles = newFiles.filter(file => file.type.startsWith("image/"));
-
-        if (imageFiles.length === 0 && newFiles.length > 0) {
-            console.warn("Only image files are allowed.");
-            return;
+        // Use custom filter if provided, otherwise use default image filter
+        let validFiles: File[];
+        
+        if (filterFiles) {
+            validFiles = filterFiles(newFiles);
+        } else if (accept && !accept.includes('image/*')) {
+            // If accept is specified and not images, use it
+            validFiles = newFiles; // Let the parent component filter
+        } else {
+            // Default: filter for images only
+            validFiles = newFiles.filter(file => file.type.startsWith("image/"));
+            if (validFiles.length === 0 && newFiles.length > 0) {
+                console.warn("Only image files are allowed.");
+                return;
+            }
         }
 
         // We want to accumulate files, but unique check might be good? For now, simple append
         setFiles((prevFiles) => {
-            const updated = [...prevFiles, ...imageFiles];
+            const updated = [...prevFiles, ...validFiles];
             // We should notify parent with the FULL list if that's what App expects, 
             // OR checks how App handles it. 
             // App.tsx currently overwrites: setFiles(selectedFiles);
@@ -38,6 +51,16 @@ export const FileUpload = ({
         fileInputRef.current?.click();
     };
 
+    // Build accept object for dropzone
+    const acceptObject = accept ? (accept.includes(',') 
+      ? accept.split(',').reduce((acc, type) => {
+          const trimmed = type.trim();
+          acc[trimmed] = [];
+          return acc;
+        }, {} as Record<string, string[]>)
+      : { [accept]: [] }
+    ) : { 'image/*': [] };
+
     const { getRootProps, isDragActive } = useDropzone({
         multiple: true,
         noClick: true,
@@ -45,9 +68,7 @@ export const FileUpload = ({
         onDropRejected: (error: any) => {
             console.log(error);
         },
-        accept: {
-            'image/*': []
-        }
+        accept: acceptObject
     });
 
     return (
@@ -61,7 +82,7 @@ export const FileUpload = ({
                     ref={fileInputRef}
                     id="file-upload-handle"
                     type="file"
-                    accept="image/*"
+                    accept={accept || "image/*"}
                     multiple
                     onChange={(e) => handleFileChange(Array.from(e.target.files || []))}
                     className="hidden"

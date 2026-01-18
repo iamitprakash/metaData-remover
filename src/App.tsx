@@ -18,12 +18,14 @@ import {
   IconBrandX,
   IconHeart,
   IconFileText,
-  IconPhoto
+  IconPhoto,
+  IconFile
 } from '@tabler/icons-react';
 import { FileUpload } from './components/ui/file-upload';
 import { FormBuilder } from './components/FormBuilder/FormBuilder';
 import { PDFEditor } from './components/PDFEditor/PDFEditor';
 import { ImageCompressor } from './components/ImageCompressor/ImageCompressor';
+import { FileConverter } from './components/FileConverter/FileConverter';
 import { removeMetadata, formatBytes } from './utils/imageProcessor';
 import { Button } from './components/ui/stateful-button';
 
@@ -399,7 +401,7 @@ function MetadataRemover() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter'>('home');
 
   return (
     <div className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 relative overflow-hidden selection:bg-primary/30 font-sans">
@@ -426,7 +428,7 @@ export default function App() {
         </p>
 
         {/* Feature Cards - Compact & Scalable Design */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-10 max-w-5xl mx-auto w-full">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-10 max-w-6xl mx-auto w-full">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -502,6 +504,26 @@ export default function App() {
                 <h3 className="font-bold text-sm md:text-base text-foreground mb-1">Image Compressor</h3>
                 <p className="text-xs text-muted-foreground leading-snug">
                   Resize & compress images
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            onClick={() => setActiveTab('converter')}
+            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconFile size={28} className="text-primary" />
+              </div>
+              <div className="w-full">
+                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">File Converter</h3>
+                <p className="text-xs text-muted-foreground leading-snug">
+                  PDF ↔ DOCX conversion
                 </p>
               </div>
             </div>
@@ -582,6 +604,24 @@ export default function App() {
               <IconPhoto size={16} /> Image Compressor
             </span>
           </button>
+          <button
+            onClick={() => setActiveTab('converter')}
+            className={`
+                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                            ${activeTab === 'converter' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                        `}
+          >
+            {activeTab === 'converter' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2">
+              <IconFile size={16} /> File Converter
+            </span>
+          </button>
         </div>
       </motion.div>
 
@@ -617,7 +657,7 @@ export default function App() {
             >
               <PDFEditor />
             </motion.div>
-          ) : (
+          ) : activeTab === 'compressor' ? (
             <motion.div
               key="compressor"
               initial={{ opacity: 0, x: 20 }}
@@ -626,6 +666,16 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               <ImageCompressor />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="converter"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FileConverter />
             </motion.div>
           )}
         </AnimatePresence>

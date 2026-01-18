@@ -41,12 +41,23 @@ export const ImageCompressor = () => {
       file.type.startsWith('image/')
     );
 
-    if (imageFiles.length === 0) {
+    if (imageFiles.length === 0 && selectedFiles.length > 0) {
       setError('Please select image files only');
       return;
     }
 
-    setFiles(prev => [...prev, ...imageFiles]);
+    // FileUpload component accumulates files internally and passes the full accumulated list
+    // So we should replace files instead of appending to avoid duplicates
+    // Also remove duplicates by creating a Map keyed by name+size+lastModified
+    const uniqueFiles = new Map<string, File>();
+    imageFiles.forEach(file => {
+      const key = `${file.name}-${file.size}-${file.lastModified}`;
+      if (!uniqueFiles.has(key)) {
+        uniqueFiles.set(key, file);
+      }
+    });
+    
+    setFiles(Array.from(uniqueFiles.values()));
     setError(null);
     // Clear preview sizes when new files are added
     setPreviewSizes(new Map());
