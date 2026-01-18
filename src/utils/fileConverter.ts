@@ -16,6 +16,12 @@ if (typeof window !== 'undefined') {
 export async function convertPDFToDOCX(file: File): Promise<Blob> {
   try {
     const arrayBuffer = await file.arrayBuffer();
+    
+    // Ensure worker is initialized
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    }
+    
     const loadingTask = pdfjsLib.getDocument({ 
       data: arrayBuffer,
       verbosity: 0
@@ -25,66 +31,85 @@ export async function convertPDFToDOCX(file: File): Promise<Blob> {
     const paragraphs: Paragraph[] = [];
     const numPages = pdf.numPages;
     
+    if (numPages === 0) {
+      throw new Error('PDF has no pages');
+    }
+    
     // Extract text from each page
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum - 1);
-      const textContent = await page.getTextContent();
+      // pdf.js uses 0-indexed pages
+      const pageIndex = pageNum - 1;
       
-      // Group text items into paragraphs (items with similar Y positions)
-      const textItems = textContent.items as any[];
-      let currentParagraph: string[] = [];
-      let lastY = -1;
+      // Validate page index
+      if (pageIndex < 0 || pageIndex >= numPages) {
+        console.warn(`Skipping invalid page index: ${pageIndex}, total pages: ${numPages}`);
+        continue;
+      }
       
-      for (const item of textItems) {
-        if (item.str && item.str.trim()) {
-          const itemY = item.transform[5]; // Y coordinate
-          
-          // If Y position changed significantly, start new paragraph
-          if (lastY !== -1 && Math.abs(itemY - lastY) > 5) {
-            if (currentParagraph.length > 0) {
-              paragraphs.push(
-                new Paragraph({
-                  children: [new TextRun(currentParagraph.join(' '))],
-                })
-              );
-              currentParagraph = [];
+      try {
+        const page = await pdf.getPage(pageIndex);
+        const textContent = await page.getTextContent();
+        
+        // Group text items into paragraphs (items with similar Y positions)
+        const textItems = textContent.items as any[];
+        let currentParagraph: string[] = [];
+        let lastY = -1;
+        
+        for (const item of textItems) {
+          if (item.str && item.str.trim()) {
+            const itemY = item.transform[5]; // Y coordinate
+            
+            // If Y position changed significantly, start new paragraph
+            if (lastY !== -1 && Math.abs(itemY - lastY) > 5) {
+              if (currentParagraph.length > 0) {
+                paragraphs.push(
+                  new Paragraph({
+                    children: [new TextRun(currentParagraph.join(' '))],
+                  })
+                );
+                currentParagraph = [];
+              }
             }
+            
+            currentParagraph.push(item.str);
+            lastY = itemY;
           }
-          
-          currentParagraph.push(item.str);
-          lastY = itemY;
         }
-      }
-      
-      // Add remaining text as paragraph
-      if (currentParagraph.length > 0) {
-        paragraphs.push(
-          new Paragraph({
-            children: [new TextRun(currentParagraph.join(' '))],
-          })
-        );
-      }
-      
-      // Add page break (except for last page)
-      if (pageNum < numPages) {
-        paragraphs.push(
-          new Paragraph({
-            text: '',
-            heading: HeadingLevel.HEADING_1,
-          })
-        );
+        
+        // Add remaining text as paragraph
+        if (currentParagraph.length > 0) {
+          paragraphs.push(
+            new Paragraph({
+              children: [new TextRun(currentParagraph.join(' '))],
+            })
+          );
+        }
+        
+        // Add page break (except for last page)
+        if (pageNum < numPages) {
+          paragraphs.push(
+            new Paragraph({
+              text: '',
+              heading: HeadingLevel.HEADING_1,
+            })
+          );
+        }
+      } catch (pageError) {
+        console.warn(`Failed to extract text from page ${pageNum}:`, pageError);
+        // Continue with next page instead of failing completely
+        continue;
       }
     }
     
     // Create DOCX document
+    if (paragraphs.length === 0) {
+      throw new Error('No text content could be extracted from PDF. The PDF may be image-based or encrypted.');
+    }
+    
     const doc = new Document({
       sections: [{
         properties: {},
-        children: paragraphs.length > 0 ? paragraphs : [
-          new Paragraph({
-            children: [new TextRun('(No text content found in PDF)')],
-          })
-        ],
+        children: paragraphs,
       }],
     });
     
@@ -94,6 +119,42 @@ export async function convertPDFToDOCX(file: File): Promise<Blob> {
   } catch (error) {
     throw new Error(`Failed to convert PDF to DOCX: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+/**
+ * Sanitize text to remove or replace Unicode characters that can't be encoded in WinAnsi
+ */
+function sanitizeTextForPDF(text: string): string {
+  // Replace common Unicode characters with ASCII equivalents
+  const replacements: Record<string, string> = {
+    '\u2022': '•', // Bullet
+    '\u2013': '-', // En dash
+    '\u2014': '--', // Em dash
+    '\u2018': "'", // Left single quotation mark
+    '\u2019': "'", // Right single quotation mark
+    '\u201C': '"', // Left double quotation mark
+    '\u201D': '"', // Right double quotation mark
+    '\u2026': '...', // Horizontal ellipsis
+    '\u00A0': ' ', // Non-breaking space
+  };
+  
+  // Replace known problematic characters
+  let sanitized = text;
+  for (const [unicode, replacement] of Object.entries(replacements)) {
+    sanitized = sanitized.replace(new RegExp(unicode, 'g'), replacement);
+  }
+  
+  // Remove or replace other non-ASCII characters that can't be encoded
+  // Keep only printable ASCII characters (32-126) and common whitespace
+  return sanitized.split('').map(char => {
+    const code = char.charCodeAt(0);
+    // Allow ASCII printable (32-126), tab (9), newline (10), carriage return (13)
+    if ((code >= 32 && code <= 126) || code === 9 || code === 10 || code === 13) {
+      return char;
+    }
+    // Replace other characters with a space or question mark
+    return '?';
+  }).join('');
 }
 
 /**
@@ -144,6 +205,11 @@ export async function convertDOCXToPDF(file: File): Promise<Blob> {
       }
       
       if (paragraphText.trim()) {
+        // Sanitize text to handle Unicode characters
+        paragraphText = sanitizeTextForPDF(paragraphText);
+        
+        if (!paragraphText.trim()) continue; // Skip if all text was removed during sanitization
+        
         // Check if we need a new page
         if (yPosition < margin + lineHeight) {
           currentPage = pdfDoc.addPage([595, 842]);
@@ -160,17 +226,50 @@ export async function convertDOCXToPDF(file: File): Promise<Blob> {
         
         for (const word of words) {
           const testLine = currentLine ? `${currentLine} ${word}` : word;
-          const textWidth = font.widthOfTextAtSize(testLine, 12);
+          
+          // Try to calculate text width, catch errors for unsupported characters
+          let textWidth: number;
+          try {
+            textWidth = font.widthOfTextAtSize(testLine, 12);
+          } catch (error) {
+            // If width calculation fails, sanitize the line and try again
+            const sanitizedLine = sanitizeTextForPDF(testLine);
+            try {
+              textWidth = font.widthOfTextAtSize(sanitizedLine, 12);
+              // Update testLine to sanitized version
+              if (currentLine) {
+                currentLine = sanitizeTextForPDF(currentLine);
+                testLine = `${currentLine} ${sanitizeTextForPDF(word)}`;
+              } else {
+                testLine = sanitizeTextForPDF(word);
+              }
+            } catch {
+              // If still fails, use a fallback width estimate
+              textWidth = testLine.length * 7; // Rough estimate: 7 pixels per character
+            }
+          }
           
           if (textWidth > pageWidth - 2 * margin && currentLine) {
             // Draw current line
-            currentPage.drawText(currentLine, {
-              x: margin,
-              y: yPosition,
-              size: 12,
-              font: font,
-              color: rgb(0, 0, 0),
-            });
+            try {
+              currentPage.drawText(currentLine, {
+                x: margin,
+                y: yPosition,
+                size: 12,
+                font: font,
+                color: rgb(0, 0, 0),
+              });
+            } catch (error) {
+              // If drawing fails, try with sanitized text
+              const sanitizedLine = sanitizeTextForPDF(currentLine);
+              currentPage.drawText(sanitizedLine, {
+                x: margin,
+                y: yPosition,
+                size: 12,
+                font: font,
+                color: rgb(0, 0, 0),
+              });
+            }
             yPosition -= lineHeight;
             currentLine = word;
             
@@ -186,13 +285,25 @@ export async function convertDOCXToPDF(file: File): Promise<Blob> {
         
         // Draw remaining text
         if (currentLine) {
-          currentPage.drawText(currentLine, {
-            x: margin,
-            y: yPosition,
-            size: 12,
-            font: font,
-            color: rgb(0, 0, 0),
-          });
+          try {
+            currentPage.drawText(currentLine, {
+              x: margin,
+              y: yPosition,
+              size: 12,
+              font: font,
+              color: rgb(0, 0, 0),
+            });
+          } catch (error) {
+            // If drawing fails, try with sanitized text
+            const sanitizedLine = sanitizeTextForPDF(currentLine);
+            currentPage.drawText(sanitizedLine, {
+              x: margin,
+              y: yPosition,
+              size: 12,
+              font: font,
+              color: rgb(0, 0, 0),
+            });
+          }
           yPosition -= lineHeight * 1.5; // Extra space between paragraphs
         }
       }
@@ -384,6 +495,12 @@ export async function convertEPUBToPDF(file: File): Promise<Blob> {
 export async function convertPDFToEPUB(file: File): Promise<Blob> {
   try {
     const arrayBuffer = await file.arrayBuffer();
+    
+    // Ensure worker is initialized
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    }
+    
     const loadingTask = pdfjsLib.getDocument({ 
       data: arrayBuffer,
       verbosity: 0
@@ -391,29 +508,48 @@ export async function convertPDFToEPUB(file: File): Promise<Blob> {
     const pdf = await loadingTask.promise;
     
     const numPages = pdf.numPages;
+    if (numPages === 0) {
+      throw new Error('PDF has no pages');
+    }
+    
     const chapters: { title: string; content: string }[] = [];
     
     // Extract text from each page
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum - 1);
-      const textContent = await page.getTextContent();
+      // pdf.js uses 0-indexed pages
+      const pageIndex = pageNum - 1;
       
-      const textItems = textContent.items as any[];
-      const pageText = textItems
-        .map(item => item.str)
-        .filter(str => str && str.trim())
-        .join(' ');
+      // Validate page index
+      if (pageIndex < 0 || pageIndex >= numPages) {
+        console.warn(`Skipping invalid page index: ${pageIndex}, total pages: ${numPages}`);
+        continue;
+      }
       
-      if (pageText.trim()) {
-        chapters.push({
-          title: `Page ${pageNum}`,
-          content: pageText
-        });
+      try {
+        const page = await pdf.getPage(pageIndex);
+        const textContent = await page.getTextContent();
+        
+        const textItems = textContent.items as any[];
+        const pageText = textItems
+          .map(item => item.str)
+          .filter(str => str && str.trim())
+          .join(' ');
+        
+        if (pageText.trim()) {
+          chapters.push({
+            title: `Page ${pageNum}`,
+            content: pageText
+          });
+        }
+      } catch (pageError) {
+        console.warn(`Failed to extract text from page ${pageNum}:`, pageError);
+        // Continue with next page instead of failing completely
+        continue;
       }
     }
     
     if (chapters.length === 0) {
-      throw new Error('No text content found in PDF');
+      throw new Error('No text content could be extracted from PDF. The PDF may be image-based or encrypted.');
     }
     
     // Create EPUB structure using JSZip
