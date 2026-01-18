@@ -42,6 +42,7 @@ import {
   IconBarcode,
   IconCrop,
   IconPalette,
+  IconMail,
 } from '@tabler/icons-react';
 import { FileUpload } from './components/ui/file-upload';
 import { FormBuilder } from './components/FormBuilder/FormBuilder';
@@ -74,7 +75,6 @@ import { APIBuilder } from './components/APIBuilder/APIBuilder';
 import { CodeMinifier } from './components/CodeMinifier/CodeMinifier';
 import { LoremIpsum } from './components/LoremIpsum/LoremIpsum';
 import { TextToSpeech } from './components/TextToSpeech/TextToSpeech';
-import { ImageResizer } from './components/ImageResizer/ImageResizer';
 import { ImageFormatConverter } from './components/ImageFormatConverter/ImageFormatConverter';
 import { QRCodeReader } from './components/QRCodeReader/QRCodeReader';
 import { ImageCropper } from './components/ImageCropper/ImageCropper';
@@ -88,6 +88,16 @@ import { RandomData } from './components/RandomData/RandomData';
 import { BrowserInfo } from './components/BrowserInfo/BrowserInfo';
 import { ClipboardHistory } from './components/ClipboardHistory/ClipboardHistory';
 import { ColorPalette } from './components/ColorPalette/ColorPalette';
+import { IPAddressTools } from './components/IPAddressTools/IPAddressTools';
+import { EmailValidator } from './components/EmailValidator/EmailValidator';
+import { FileHashChecker } from './components/FileHashChecker/FileHashChecker';
+import { TwoFactorAuth } from './components/TwoFactorAuth/TwoFactorAuth';
+import { GraphQLFormatter } from './components/GraphQLFormatter/GraphQLFormatter';
+import { CurlGenerator } from './components/CurlGenerator/CurlGenerator';
+import { SQLFormatter } from './components/SQLFormatter/SQLFormatter';
+import { JSONPathFinder } from './components/JSONPathFinder/JSONPathFinder';
+import { XMLValidator } from './components/XMLValidator/XMLValidator';
+import { HTTPStatusLookup } from './components/HTTPStatusLookup/HTTPStatusLookup';
 import { removeMetadata, formatBytes } from './utils/imageProcessor';
 import { Button } from './components/ui/stateful-button';
 
@@ -463,7 +473,7 @@ function MetadataRemover() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter' | 'text-diff' | 'password-generator' | 'qrcode' | 'base64' | 'hash-generator' | 'csv-json-converter' | 'markdown-editor' | 'text-utilities' | 'yaml-formatter' | 'html-css-formatter' | 'uuid-generator' | 'calculator' | 'stopwatch' | 'jwt-decoder' | 'url-encoder' | 'password-strength' | 'data-masking' | 'regex-tester' | 'json-to-typescript' | 'color-picker' | 'api-builder' | 'code-minifier' | 'lorem-ipsum' | 'text-to-speech' | 'image-resizer' | 'image-format-converter' | 'qrcode-reader' | 'image-cropper' | 'unit-converter' | 'datetime-converter' | 'number-base-converter' | 'morse-code' | 'roman-numeral' | 'barcode-generator' | 'random-data' | 'browser-info' | 'clipboard-history' | 'color-palette'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter' | 'text-diff' | 'password-generator' | 'qrcode' | 'base64' | 'hash-generator' | 'csv-json-converter' | 'markdown-editor' | 'text-utilities' | 'yaml-formatter' | 'html-css-formatter' | 'uuid-generator' | 'calculator' | 'stopwatch' | 'jwt-decoder' | 'url-encoder' | 'password-strength' | 'data-masking' | 'regex-tester' | 'json-to-typescript' | 'color-picker' | 'api-builder' | 'code-minifier' | 'lorem-ipsum' | 'text-to-speech' | 'image-format-converter' | 'qrcode-reader' | 'image-cropper' | 'unit-converter' | 'datetime-converter' | 'number-base-converter' | 'morse-code' | 'roman-numeral' | 'barcode-generator' | 'random-data' | 'browser-info' | 'clipboard-history' | 'color-palette' | 'ip-tools' | 'email-validator' | 'file-hash-checker' | 'two-factor-auth' | 'graphql-formatter' | 'curl-generator' | 'sql-formatter' | 'json-path-finder' | 'xml-validator' | 'http-status-lookup'>('home');
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Scroll to content when tab changes (except on initial load)
@@ -1135,26 +1145,6 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 3.2 }}
-            onClick={() => handleTabChange('image-resizer')}
-            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-          >
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconPhoto size={24} className="text-primary" />
-              </div>
-              <div className="w-full min-h-[3.5rem]">
-                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Image Resizer</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                  Resize images
-                </p>
-              </div>
-            </div>
-          </motion.button>
-
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.3 }}
             onClick={() => handleTabChange('image-format-converter')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1174,7 +1164,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.4 }}
+            transition={{ delay: 3.3 }}
             onClick={() => handleTabChange('qrcode-reader')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1194,7 +1184,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.5 }}
+            transition={{ delay: 3.4 }}
             onClick={() => handleTabChange('image-cropper')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1214,7 +1204,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.6 }}
+            transition={{ delay: 3.5 }}
             onClick={() => handleTabChange('unit-converter')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1234,7 +1224,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.7 }}
+            transition={{ delay: 3.6 }}
             onClick={() => handleTabChange('datetime-converter')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1254,7 +1244,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.8 }}
+            transition={{ delay: 3.7 }}
             onClick={() => handleTabChange('number-base-converter')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1274,7 +1264,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 3.9 }}
+            transition={{ delay: 3.8 }}
             onClick={() => handleTabChange('morse-code')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1294,7 +1284,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 4.0 }}
+            transition={{ delay: 3.9 }}
             onClick={() => handleTabChange('roman-numeral')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1314,7 +1304,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 4.1 }}
+            transition={{ delay: 4.0 }}
             onClick={() => handleTabChange('barcode-generator')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1354,7 +1344,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 4.3 }}
+            transition={{ delay: 4.2 }}
             onClick={() => handleTabChange('browser-info')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1374,7 +1364,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 4.4 }}
+            transition={{ delay: 4.3 }}
             onClick={() => handleTabChange('clipboard-history')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1394,7 +1384,7 @@ export default function App() {
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 4.5 }}
+            transition={{ delay: 4.4 }}
             onClick={() => handleTabChange('color-palette')}
             className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
@@ -1406,6 +1396,208 @@ export default function App() {
                 <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Color Palette</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Generate palettes
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          {/* New Features Batch 2 */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4.5 }}
+            onClick={() => handleTabChange('ip-tools')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconWorld size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">IP Tools</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  IP lookup & subnet calc
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4.7 }}
+            onClick={() => handleTabChange('email-validator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconMail size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Email Validator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Validate emails
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4.7 }}
+            onClick={() => handleTabChange('file-hash-checker')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconFile size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">File Hash</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Check file checksums
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4.8 }}
+            onClick={() => handleTabChange('two-factor-auth')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconShield size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">2FA Generator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate TOTP codes
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.0 }}
+            onClick={() => handleTabChange('graphql-formatter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">GraphQL</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Format GraphQL queries
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.0 }}
+            onClick={() => handleTabChange('curl-generator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">cURL Generator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate cURL commands
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          {/* Developer Tools */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.2 }}
+            onClick={() => handleTabChange('sql-formatter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">SQL Formatter</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Format SQL queries
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.2 }}
+            onClick={() => handleTabChange('json-path-finder')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">JSON Path</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Extract JSON data
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.4 }}
+            onClick={() => handleTabChange('xml-validator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">XML Validator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Validate XML syntax
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 5.4 }}
+            onClick={() => handleTabChange('http-status-lookup')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconWorld size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">HTTP Status</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Status code lookup
                 </p>
               </div>
             </div>
@@ -2172,10 +2364,6 @@ export default function App() {
             <motion.div key="text-to-speech" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <TextToSpeech />
             </motion.div>
-          ) : activeTab === 'image-resizer' ? (
-            <motion.div key="image-resizer" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
-              <ImageResizer />
-            </motion.div>
           ) : activeTab === 'image-format-converter' ? (
             <motion.div key="image-format-converter" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <ImageFormatConverter />
@@ -2224,9 +2412,49 @@ export default function App() {
             <motion.div key="clipboard-history" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <ClipboardHistory />
             </motion.div>
-          ) : (
+          ) : activeTab === 'color-palette' ? (
             <motion.div key="color-palette" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
               <ColorPalette />
+            </motion.div>
+          ) : activeTab === 'ip-tools' ? (
+            <motion.div key="ip-tools" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <IPAddressTools />
+            </motion.div>
+          ) : activeTab === 'email-validator' ? (
+            <motion.div key="email-validator" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <EmailValidator />
+            </motion.div>
+          ) : activeTab === 'file-hash-checker' ? (
+            <motion.div key="file-hash-checker" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <FileHashChecker />
+            </motion.div>
+          ) : activeTab === 'two-factor-auth' ? (
+            <motion.div key="two-factor-auth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <TwoFactorAuth />
+            </motion.div>
+          ) : activeTab === 'graphql-formatter' ? (
+            <motion.div key="graphql-formatter" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <GraphQLFormatter />
+            </motion.div>
+          ) : activeTab === 'curl-generator' ? (
+            <motion.div key="curl-generator" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <CurlGenerator />
+            </motion.div>
+          ) : activeTab === 'sql-formatter' ? (
+            <motion.div key="sql-formatter" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <SQLFormatter />
+            </motion.div>
+          ) : activeTab === 'json-path-finder' ? (
+            <motion.div key="json-path-finder" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <JSONPathFinder />
+            </motion.div>
+          ) : activeTab === 'xml-validator' ? (
+            <motion.div key="xml-validator" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <XMLValidator />
+            </motion.div>
+          ) : (
+            <motion.div key="http-status-lookup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+              <HTTPStatusLookup />
             </motion.div>
           )}
         </AnimatePresence>
