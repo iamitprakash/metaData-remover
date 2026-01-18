@@ -22,7 +22,12 @@ import {
   IconFile,
   IconCode,
   IconArrowsExchange,
-  IconGitCompare
+  IconGitCompare,
+  IconKey,
+  IconQrcode,
+  IconHash,
+  IconMarkdown,
+  IconTypography,
 } from '@tabler/icons-react';
 import { FileUpload } from './components/ui/file-upload';
 import { FormBuilder } from './components/FormBuilder/FormBuilder';
@@ -32,6 +37,16 @@ import { FileConverter } from './components/FileConverter/FileConverter';
 import { JSONFormatter } from './components/JSONFormatter/JSONFormatter';
 import { XMLJSONConverter } from './components/XMLJSONConverter/XMLJSONConverter';
 import { TextDiff } from './components/TextDiff/TextDiff';
+import { PasswordGenerator } from './components/PasswordGenerator/PasswordGenerator';
+import { QRCode } from './components/QRCode/QRCode';
+import { Base64 } from './components/Base64/Base64';
+import { HashGenerator } from './components/HashGenerator/HashGenerator';
+import { CSVJSONConverter } from './components/CSVJSONConverter/CSVJSONConverter';
+import { MarkdownEditor } from './components/MarkdownEditor/MarkdownEditor';
+import { TextUtilities } from './components/TextUtilities/TextUtilities';
+import { YAMLFormatter } from './components/YAMLFormatter/YAMLFormatter';
+import { HTMLCSSFormatter } from './components/HTMLCSSFormatter/HTMLCSSFormatter';
+import { UUIDGenerator } from './components/UUIDGenerator/UUIDGenerator';
 import { removeMetadata, formatBytes } from './utils/imageProcessor';
 import { Button } from './components/ui/stateful-button';
 
@@ -407,7 +422,7 @@ function MetadataRemover() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter' | 'text-diff'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter' | 'text-diff' | 'password-generator' | 'qrcode' | 'base64' | 'hash-generator' | 'csv-json-converter' | 'markdown-editor' | 'text-utilities' | 'yaml-formatter' | 'html-css-formatter' | 'uuid-generator'>('home');
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Scroll to content when tab changes (except on initial load)
@@ -453,7 +468,7 @@ export default function App() {
         </p>
 
         {/* Feature Cards - Responsive Grid Design */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5 mb-12 max-w-7xl mx-auto w-full px-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5 mb-12 max-w-7xl mx-auto w-full px-4">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -613,6 +628,206 @@ export default function App() {
               </div>
             </div>
           </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            onClick={() => handleTabChange('password-generator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconKey size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Password Generator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate secure passwords
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            onClick={() => handleTabChange('qrcode')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconQrcode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">QR Code</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate QR codes
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            onClick={() => handleTabChange('base64')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Base64</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Encode & decode Base64
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            onClick={() => handleTabChange('hash-generator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconHash size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Hash Generator</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate hashes
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.3 }}
+            onClick={() => handleTabChange('csv-json-converter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconArrowsExchange size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">CSV ↔ JSON</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Convert CSV & JSON
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4 }}
+            onClick={() => handleTabChange('markdown-editor')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconMarkdown size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Markdown</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Edit & preview markdown
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            onClick={() => handleTabChange('text-utilities')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconTypography size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Text Tools</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Text utilities & stats
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+            onClick={() => handleTabChange('yaml-formatter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">YAML</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Format & validate YAML
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.7 }}
+            onClick={() => handleTabChange('html-css-formatter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">HTML/CSS</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Format & minify
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8 }}
+            onClick={() => handleTabChange('uuid-generator')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconKey size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">UUID</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Generate UUIDs
+                </p>
+              </div>
+            </div>
+          </motion.button>
         </div>
 
         {/* Tab Navigation - Enhanced Design */}
@@ -685,21 +900,25 @@ export default function App() {
             </span>
           </button>
           <button
-            onClick={() => setActiveTab('compressor')}
+            onClick={() => handleTabChange('compressor')}
             className={`
-                            relative px-4 md:px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
-                            ${activeTab === 'compressor' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'compressor' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'compressor' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
             <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
-              <IconPhoto size={16} /> Image Compressor
+              <IconPhoto size={16} className={activeTab === 'compressor' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Image Compressor</span>
+              <span className="sm:hidden">Images</span>
             </span>
           </button>
           <button
@@ -791,6 +1010,226 @@ export default function App() {
               <span className="sm:hidden">Diff</span>
             </span>
           </button>
+          <button
+            onClick={() => handleTabChange('password-generator')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'password-generator' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'password-generator' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconKey size={16} className={activeTab === 'password-generator' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Password</span>
+              <span className="sm:hidden">Pass</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('qrcode')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'qrcode' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'qrcode' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconQrcode size={16} className={activeTab === 'qrcode' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">QR Code</span>
+              <span className="sm:hidden">QR</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('base64')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'base64' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'base64' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconCode size={16} className={activeTab === 'base64' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Base64</span>
+              <span className="sm:hidden">B64</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('hash-generator')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'hash-generator' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'hash-generator' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconHash size={16} className={activeTab === 'hash-generator' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Hash</span>
+              <span className="sm:hidden">Hash</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('csv-json-converter')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'csv-json-converter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'csv-json-converter' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconArrowsExchange size={16} className={activeTab === 'csv-json-converter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">CSV↔JSON</span>
+              <span className="sm:hidden">CSV</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('markdown-editor')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'markdown-editor' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'markdown-editor' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconMarkdown size={16} className={activeTab === 'markdown-editor' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Markdown</span>
+              <span className="sm:hidden">MD</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('text-utilities')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'text-utilities' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'text-utilities' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconTypography size={16} className={activeTab === 'text-utilities' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Text Tools</span>
+              <span className="sm:hidden">Text</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('yaml-formatter')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'yaml-formatter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'yaml-formatter' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconCode size={16} className={activeTab === 'yaml-formatter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">YAML</span>
+              <span className="sm:hidden">YAML</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('html-css-formatter')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'html-css-formatter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'html-css-formatter' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconCode size={16} className={activeTab === 'html-css-formatter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">HTML/CSS</span>
+              <span className="sm:hidden">HTML</span>
+            </span>
+          </button>
+          <button
+            onClick={() => handleTabChange('uuid-generator')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'uuid-generator' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'uuid-generator' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconKey size={16} className={activeTab === 'uuid-generator' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">UUID</span>
+              <span className="sm:hidden">UUID</span>
+            </span>
+          </button>
           </div>
         </div>
       </motion.div>
@@ -867,7 +1306,7 @@ export default function App() {
             >
               <XMLJSONConverter />
             </motion.div>
-          ) : (
+          ) : activeTab === 'text-diff' ? (
             <motion.div
               key="text-diff"
               initial={{ opacity: 0, x: 20 }}
@@ -876,6 +1315,106 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               <TextDiff />
+            </motion.div>
+          ) : activeTab === 'password-generator' ? (
+            <motion.div
+              key="password-generator"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PasswordGenerator />
+            </motion.div>
+          ) : activeTab === 'qrcode' ? (
+            <motion.div
+              key="qrcode"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <QRCode />
+            </motion.div>
+          ) : activeTab === 'base64' ? (
+            <motion.div
+              key="base64"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Base64 />
+            </motion.div>
+          ) : activeTab === 'hash-generator' ? (
+            <motion.div
+              key="hash-generator"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <HashGenerator />
+            </motion.div>
+          ) : activeTab === 'csv-json-converter' ? (
+            <motion.div
+              key="csv-json-converter"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CSVJSONConverter />
+            </motion.div>
+          ) : activeTab === 'markdown-editor' ? (
+            <motion.div
+              key="markdown-editor"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <MarkdownEditor />
+            </motion.div>
+          ) : activeTab === 'text-utilities' ? (
+            <motion.div
+              key="text-utilities"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TextUtilities />
+            </motion.div>
+          ) : activeTab === 'yaml-formatter' ? (
+            <motion.div
+              key="yaml-formatter"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <YAMLFormatter />
+            </motion.div>
+          ) : activeTab === 'html-css-formatter' ? (
+            <motion.div
+              key="html-css-formatter"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <HTMLCSSFormatter />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="uuid-generator"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <UUIDGenerator />
             </motion.div>
           )}
         </AnimatePresence>
