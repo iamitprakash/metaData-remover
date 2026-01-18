@@ -317,10 +317,13 @@ export const ImageCompressor = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">Compressed Images</h2>
-              <Button onClick={handleDownloadAll} variant="outline">
-                <IconDownload className="w-4 h-4 mr-2" />
+              <button
+                onClick={handleDownloadAll}
+                className="px-4 py-2 bg-muted hover:bg-muted/80 border border-border rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+              >
+                <IconDownload className="w-4 h-4" />
                 Download All
-              </Button>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
