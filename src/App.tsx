@@ -21,7 +21,8 @@ import {
   IconPhoto,
   IconFile,
   IconCode,
-  IconArrowsExchange
+  IconArrowsExchange,
+  IconGitCompare
 } from '@tabler/icons-react';
 import { FileUpload } from './components/ui/file-upload';
 import { FormBuilder } from './components/FormBuilder/FormBuilder';
@@ -30,6 +31,7 @@ import { ImageCompressor } from './components/ImageCompressor/ImageCompressor';
 import { FileConverter } from './components/FileConverter/FileConverter';
 import { JSONFormatter } from './components/JSONFormatter/JSONFormatter';
 import { XMLJSONConverter } from './components/XMLJSONConverter/XMLJSONConverter';
+import { TextDiff } from './components/TextDiff/TextDiff';
 import { removeMetadata, formatBytes } from './utils/imageProcessor';
 import { Button } from './components/ui/stateful-button';
 
@@ -405,7 +407,26 @@ function MetadataRemover() {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'builder' | 'editor' | 'compressor' | 'converter' | 'json-formatter' | 'xml-json-converter' | 'text-diff'>('home');
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to content when tab changes (except on initial load)
+  useEffect(() => {
+    if (contentRef.current && activeTab !== 'home') {
+      const timer = setTimeout(() => {
+        contentRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      }, 100); // Small delay to ensure animation starts
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab]);
+
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center py-12 md:py-20 px-4 relative overflow-hidden selection:bg-primary/30 font-sans">
@@ -431,22 +452,22 @@ export default function App() {
           All-in-one privacy and productivity tools. Process files locally in your browser—your data never leaves your device.
         </p>
 
-        {/* Feature Cards - Compact & Scalable Design */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 md:gap-4 mb-10 max-w-8xl mx-auto w-full">
+        {/* Feature Cards - Responsive Grid Design */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-5 mb-12 max-w-7xl mx-auto w-full px-4">
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            onClick={() => setActiveTab('home')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('home')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconEraser size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconEraser size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">Metadata Cleaner</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Metadata Cleaner</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Remove EXIF, XMP, IPTC data
                 </p>
               </div>
@@ -457,16 +478,16 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            onClick={() => setActiveTab('builder')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('builder')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconWand size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconWand size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">Form Builder</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Form Builder</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Create interactive PDF forms
                 </p>
               </div>
@@ -477,16 +498,16 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            onClick={() => setActiveTab('editor')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('editor')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconFileText size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconFileText size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">PDF Editor</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">PDF Editor</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Combine, edit, extract pages
                 </p>
               </div>
@@ -498,15 +519,15 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             onClick={() => setActiveTab('compressor')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconPhoto size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconPhoto size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">Image Compressor</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Image Compressor</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Resize & compress images
                 </p>
               </div>
@@ -517,16 +538,16 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            onClick={() => setActiveTab('converter')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('converter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconFile size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconFile size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">File Converter</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">File Converter</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   PDF, DOCX & EPUB conversion
                 </p>
               </div>
@@ -537,16 +558,16 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            onClick={() => setActiveTab('json-formatter')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('json-formatter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconCode size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconCode size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">JSON Formatter</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">JSON Formatter</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Format, validate & minify
                 </p>
               </div>
@@ -557,83 +578,116 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            onClick={() => setActiveTab('xml-json-converter')}
-            className="group relative p-5 md:p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] text-left"
+            onClick={() => handleTabChange('xml-json-converter')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
           >
             <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 md:p-4 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <IconArrowsExchange size={28} className="text-primary" />
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconArrowsExchange size={24} className="text-primary" />
               </div>
-              <div className="w-full">
-                <h3 className="font-bold text-sm md:text-base text-foreground mb-1">XML/JSON Converter</h3>
-                <p className="text-xs text-muted-foreground leading-snug">
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">XML/JSON Converter</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                   Convert & format XML ↔ JSON
+                </p>
+              </div>
+            </div>
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            onClick={() => handleTabChange('text-diff')}
+            className="group relative p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/10 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <IconGitCompare size={24} className="text-primary" />
+              </div>
+              <div className="w-full min-h-[3.5rem]">
+                <h3 className="font-bold text-sm text-foreground mb-1.5 break-words">Text Diff</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                  Compare & find differences
                 </p>
               </div>
             </div>
           </motion.button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="inline-flex p-1.5 bg-muted/50 rounded-2xl border border-border/50 backdrop-blur-sm shadow-sm">
+        {/* Tab Navigation - Enhanced Design */}
+        <div className="flex justify-center w-full mb-8 px-4">
+          <div className="inline-flex p-1.5 bg-card/80 backdrop-blur-md rounded-2xl border border-border/60 shadow-lg shadow-primary/5 gap-1.5 overflow-x-auto max-w-full scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <button
-            onClick={() => setActiveTab('home')}
+            onClick={() => handleTabChange('home')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'home' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'home' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'home' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconEraser size={16} /> Metadata Cleaner
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconEraser size={16} className={activeTab === 'home' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Metadata Cleaner</span>
+              <span className="sm:hidden">Cleaner</span>
             </span>
           </button>
           <button
             onClick={() => setActiveTab('builder')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'builder' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'builder' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'builder' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconWand size={16} /> Form Builder
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconWand size={16} className={activeTab === 'builder' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Form Builder</span>
+              <span className="sm:hidden">Forms</span>
             </span>
           </button>
           <button
-            onClick={() => setActiveTab('editor')}
+            onClick={() => handleTabChange('editor')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'editor' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'editor' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'editor' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconFileText size={16} /> PDF Editor
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconFileText size={16} className={activeTab === 'editor' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">PDF Editor</span>
+              <span className="sm:hidden">PDF</span>
             </span>
           </button>
           <button
             onClick={() => setActiveTab('compressor')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
+                            relative px-4 md:px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
                             ${activeTab === 'compressor' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
                         `}
           >
@@ -644,68 +698,104 @@ export default function App() {
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
               <IconPhoto size={16} /> Image Compressor
             </span>
           </button>
           <button
-            onClick={() => setActiveTab('converter')}
+            onClick={() => handleTabChange('converter')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'converter' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'converter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'converter' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconFile size={16} /> File Converter
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconFile size={16} className={activeTab === 'converter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">File Converter</span>
+              <span className="sm:hidden">Convert</span>
             </span>
           </button>
           <button
-            onClick={() => setActiveTab('json-formatter')}
+            onClick={() => handleTabChange('json-formatter')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'json-formatter' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'json-formatter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'json-formatter' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconCode size={16} /> JSON Formatter
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconCode size={16} className={activeTab === 'json-formatter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">JSON Formatter</span>
+              <span className="sm:hidden">JSON</span>
             </span>
           </button>
           <button
-            onClick={() => setActiveTab('xml-json-converter')}
+            onClick={() => handleTabChange('xml-json-converter')}
             className={`
-                            relative px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300
-                            ${activeTab === 'xml-json-converter' ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'xml-json-converter' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
                         `}
           >
             {activeTab === 'xml-json-converter' && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/20"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
-            <span className="relative z-10 flex items-center gap-2">
-              <IconArrowsExchange size={16} /> XML/JSON Converter
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconArrowsExchange size={16} className={activeTab === 'xml-json-converter' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden md:inline">XML/JSON Converter</span>
+              <span className="hidden sm:inline md:hidden">XML/JSON</span>
+              <span className="sm:hidden">XML</span>
             </span>
           </button>
+          <button
+            onClick={() => handleTabChange('text-diff')}
+            className={`
+                            relative px-4 md:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex-shrink-0
+                            ${activeTab === 'text-diff' 
+                              ? 'text-primary-foreground shadow-md' 
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}
+                        `}
+          >
+            {activeTab === 'text-diff' && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/30"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap">
+              <IconGitCompare size={16} className={activeTab === 'text-diff' ? 'text-primary-foreground' : 'text-muted-foreground'} /> 
+              <span className="hidden sm:inline">Text Diff</span>
+              <span className="sm:hidden">Diff</span>
+            </span>
+          </button>
+          </div>
         </div>
       </motion.div>
 
-      <div className="w-full relative z-10">
+      <div ref={contentRef} className="w-full relative z-10 scroll-mt-8">
         <AnimatePresence mode="wait">
           {activeTab === 'home' ? (
             <motion.div
@@ -767,7 +857,7 @@ export default function App() {
             >
               <JSONFormatter />
             </motion.div>
-          ) : (
+          ) : activeTab === 'xml-json-converter' ? (
             <motion.div
               key="xml-json-converter"
               initial={{ opacity: 0, x: 20 }}
@@ -776,6 +866,16 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               <XMLJSONConverter />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="text-diff"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TextDiff />
             </motion.div>
           )}
         </AnimatePresence>
