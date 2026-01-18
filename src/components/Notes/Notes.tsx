@@ -38,12 +38,12 @@ export const Notes = () => {
   const { showToast } = useToast();
 
   // Create refs for each note - use a ref to store refs map and keep them stable
-  const noteRefsMap = useRef<Record<string, React.RefObject<HTMLElement | null>>>({});
+  const noteRefsMap = useRef<Record<string, React.RefObject<HTMLDivElement>>>({});
   
   // Get or create ref for a note (called during render but stable)
-  const getNoteRef = (id: string): React.RefObject<HTMLElement | null> => {
+  const getNoteRef = (id: string): React.RefObject<HTMLDivElement> => {
     if (!noteRefsMap.current[id]) {
-      noteRefsMap.current[id] = React.createRef<HTMLElement | null>();
+      noteRefsMap.current[id] = React.createRef<HTMLDivElement>();
     }
     return noteRefsMap.current[id];
   };
@@ -246,7 +246,7 @@ export const Notes = () => {
               return (
                 <Draggable
                   key={note.id}
-                  nodeRef={nodeRef}
+                  nodeRef={nodeRef as React.RefObject<HTMLElement | null>}
                   position={{ x: note.x, y: note.y }}
                   onStop={(e, data) => handleDragStop(note.id, e, data)}
                   bounds="parent"
