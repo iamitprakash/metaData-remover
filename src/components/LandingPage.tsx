@@ -7,8 +7,7 @@ import {
   IconBolt,
   IconArrowRight,
   IconDeviceLaptop,
-  IconLock,
-  IconHeart
+  IconLock
 } from '@tabler/icons-react';
 import { Button } from './ui/button';
 import { TOOLS } from '../config/tools';
@@ -209,21 +208,6 @@ export const LandingPage = () => {
               SECURE LOCAL PROCESSING • ZERO SERVER UPLOADS
             </div>
             <div className="h-px w-20 bg-border/40" />
-          </div>
-
-          <div className="flex flex-col items-center gap-6">
-            <div className="flex items-center flex-wrap justify-center gap-x-2 gap-y-1 text-[13px] font-bold text-muted-foreground text-center">
-              Made with <IconHeart size={14} className="text-red-500 fill-red-500" /> by
-              <a href="https://x.com/twts_tejas" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">𝕏 Tejas</a>,
-              <a href="https://x.com/whoavidwivedi" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">𝕏 Avi</a>,
-              <a href="https://x.com/dhirender_0001" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">𝕏 Dhirender</a> &
-              <a href="https://x.com/Scalar_skeleton" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">𝕏 Scalar</a>
-            </div>
-
-            <div className="flex items-center gap-3 text-[12px] font-medium opacity-40">
-              <span>Sponsored by</span>
-              <span className="font-black uppercase tracking-widest text-foreground">Real Dev Squad</span>
-            </div>
           </div>
 
           <p className="text-[11px] font-medium text-foreground/20">© 2026 Privacy. All rights reserved.</p>
